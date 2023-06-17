@@ -1,199 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Asteroid Shooter</title>
+  <title>Klaver</title>
   <style>
-    #game-container {
-      width: 800px;
-      height: 600px;
-      border: 1px solid black;
-      margin: 0 auto;
-      position: relative;
-    }
-    
-    #spaceship {
-      position: absolute;
+    .key {
+      display: inline-block;
       width: 50px;
-      height: 50px;
-      background-color: blue;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      height: 200px;
+      background-color: white;
+      border: 1px solid black;
+      cursor: pointer;
     }
     
-    .asteroid {
-      position: absolute;
+    .black-key {
+      position: relative;
+      margin-left: -20px;
       width: 40px;
-      height: 40px;
-      background-color: gray;
-    }
-    
-    .bullet {
-      position: absolute;
-      width: 10px;
-      height: 20px;
-      background-color: red;
+      height: 120px;
+      background-color: black;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
-  <h1>Asteroid Shooter</h1>
+  <h1>Klaver</h1>
   
-  <div id="game-container">
-    <div id="spaceship"></div>
+  <div id="keyboard">
+    <div class="key" onclick="playSound('C')"></div>
+    <div class="key black-key" onclick="playSound('C#')"></div>
+    <div class="key" onclick="playSound('D')"></div>
+    <div class="key black-key" onclick="playSound('D#')"></div>
+    <div class="key" onclick="playSound('E')"></div>
+    <div class="key" onclick="playSound('F')"></div>
+    <div class="key black-key" onclick="playSound('F#')"></div>
+    <div class="key" onclick="playSound('G')"></div>
+    <div class="key black-key" onclick="playSound('G#')"></div>
+    <div class="key" onclick="playSound('A')"></div>
+    <div class="key black-key" onclick="playSound('A#')"></div>
+    <div class="key" onclick="playSound('B')"></div>
+    <div class="key" onclick="playSound('C2')"></div>
   </div>
   
   <script>
-    // Startposition for rumskibet
-    var spaceshipPosition = {
-      x: 400,
-      y: 300
-    };
-    
-    // Array til at holde styr på asteroiderne
-    var asteroids = [];
-    
-    // Tjekker om der er et skud i luften
-    var isShooting = false;
-    
-    // Funktionen, der kører, når spillet starter
-    function startGame() {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('keydown', handleKeyDown);
-      document.addEventListener('keyup', handleKeyUp);
+    // Funktionen, der afspiller lyden baseret på den modtagne tone
+    function playSound(note) {
+      var audio = new Audio();
       
-      // Starter spilloopet
-      setInterval(gameLoop, 16);
-      
-      // Tilføjer asteroider hvert sekund
-      setInterval(addAsteroid, 1000);
-    }
-    
-    // Funktionen, der håndterer musens bevægelse
-    function handleMouseMove(event) {
-      spaceshipPosition.x = event.clientX;
-      spaceshipPosition.y = event.clientY;
-    }
-    
-    // Funktionen, der håndterer tastetryk
-    function handleKeyDown(event) {
-      if (event.code === 'Space') {
-        event.preventDefault();
-        
-        if (!isShooting) {
-          shoot();
-          isShooting = true;
-        }
+      switch (note) {
+        case 'C':
+          audio.src = 'sounds/c.wav';
+          break;
+        case 'C#':
+          audio.src = 'sounds/c-sharp.wav';
+          break;
+        case 'D':
+          audio.src = 'sounds/d.wav';
+          break;
+        case 'D#':
+          audio.src = 'sounds/d-sharp.wav';
+          break;
+        case 'E':
+          audio.src = 'sounds/e.wav';
+          break;
+        case 'F':
+          audio.src = 'sounds/f.wav';
+          break;
+        case 'F#':
+          audio.src = 'sounds/f-sharp.wav';
+          break;
+        case 'G':
+          audio.src = 'sounds/g.wav';
+          break;
+        case 'G#':
+          audio.src = 'sounds/g-sharp.wav';
+          break;
+        case 'A':
+          audio.src = 'sounds/a.wav';
+          break;
+        case 'A#':
+          audio.src = 'sounds/a-sharp.wav';
+          break;
+        case 'B':
+          audio.src = 'sounds/b.wav';
+          break;
+        case 'C2':
+          audio.src = 'sounds/c2.wav';
+          break;
       }
-    }
-    
-    // Funktionen, der håndterer tasteløft
-    function handleKeyUp(event) {
-      if (event.code === 'Space') {
-        event.preventDefault();
-        
-        isShooting = false;
-      }
-    }
-    
-    // Spilloopet
-    function gameLoop() {
-      var spaceship = document.getElementById('spaceship');
       
-      // Opdaterer rumskibets position
-      spaceship.style.left = spaceshipPosition.x + 'px';
-      spaceship.style.top = spaceshipPosition.y + 'px';
-      
-      // Opdaterer asteroidernes position og tjekker kollision
-      for (var i = 0; i < asteroids.length; i++) {
-        var asteroid = asteroids[i];
-        
-        // Opdaterer positionen
-        asteroid.y += 2;
-        asteroid.style.top = asteroid.y + 'px';
-        
-        // Tjekker kollision
-        if (isColliding(spaceship, asteroid)) {
-          endGame();
-          return;
-        }
-        
-        // Fjerner asteroider, der er ude af skærmen
-        if (asteroid.y > 600) {
-          asteroid.remove();
-          asteroids.splice(i, 1);
-          i--;
-        }
-      }
-    }
-    
-    // Funktionen, der skyder en kugle
-    function shoot() {
-      var bullet = document.createElement('div');
-      bullet.className = 'bullet';
-      bullet.style.left = spaceshipPosition.x + 'px';
-      bullet.style.top = spaceshipPosition.y + 'px';
-      document.getElementById('game-container').appendChild(bullet);
-      
-      // Bevæger kuglen opad
-      var bulletInterval = setInterval(function() {
-        bullet.style.top = parseInt(bullet.style.top) - 5 + 'px';
-        
-        // Tjekker kollision med asteroider
-        for (var i = 0; i < asteroids.length; i++) {
-          var asteroid = asteroids[i];
-          
-          if (isColliding(bullet, asteroid)) {
-            bullet.remove();
-            clearInterval(bulletInterval);
-            
-            asteroid.remove();
-            asteroids.splice(i, 1);
-            break;
-          }
-        }
-        
-        // Fjerner kuglen, når den er ude af skærmen
-        if (parseInt(bullet.style.top) < 0) {
-          bullet.remove();
-          clearInterval(bulletInterval);
-        }
-      }, 16);
-    }
-    
-    // Funktionen, der tjekker for kollision mellem to elementer
-    function isColliding(element1, element2) {
-      var rect1 = element1.getBoundingClientRect();
-      var rect2 = element2.getBoundingClientRect();
-      
-      return !(rect1.right < rect2.left ||
-               rect1.left > rect2.right ||
-               rect1.bottom < rect2.top ||
-               rect1.top > rect2.bottom);
-    }
-    
-    // Funktionen, der afslutter spillet
-    function endGame() {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
-      
-      alert('Spillet er slut! Du blev ramt af en asteroide.');
-    }
-    
-    // Funktionen, der tilføjer en asteroid
-    function addAsteroid() {
-      var gameContainer = document.getElementById('game-container');
-      
-      var asteroid = document.createElement('div');
-      asteroid.className = 'asteroid';
-      
-      // Placerer asteroiden på tilfældig x-position
-      asteroid.style.left = Math.floor(Math.random() * 760) + 'px';
-      asteroid.y = -40; // Startpositionen for asteroiden
-      
-      gameContainer.appendChild(asteroid);
-      asteroids.push(asteroid);
+      audio.play();
     }
   </script>
 </body>
