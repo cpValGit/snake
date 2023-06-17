@@ -11,6 +11,8 @@
 - git commit -m "Initial commit"
 - git push -u origin main
 
+## Play game
+https://cpvalgit.github.io/snake/
 
 
 
