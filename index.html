@@ -1,47 +1,163 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Snake Game 2</title>
+  <title>Ship Avoidance</title>
   <style>
-    #game-board {
-      width: 600px;
-      height: 400px;
+    #game-container {
+      width: 500px;
+      height: 300px;
       border: 1px solid black;
-      position: relative;
-      margin: 20px auto;
+      margin: 0 auto;
+      text-align: center;
     }
-    .snake {
-      width: 20px;
-      height: 20px;
-      background-color: green;
+    
+    #ship {
       position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: blue;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .obstacle {
+      position: absolute;
+      width: 20px;
+      height: 100px;
+      background-color: green;
     }
   </style>
 </head>
 <body>
-  <div id="game-board">
-    <div id="snake" class="snake"></div>
+  <h1>Ship Avoidance</h1>
+  
+  <div id="game-container">
+    <div id="ship"></div>
   </div>
-
+  
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const snake = document.getElementById("snake");
-      let snakeX = 0;
-      let snakeY = 0;
-
-      document.addEventListener("mousemove", function(event) {
-        snakeX = event.clientX - snake.offsetWidth / 2;
-        snakeY = event.clientY - snake.offsetHeight / 2;
-      });
-
-      function moveSnake() {
-        snake.style.left = snakeX + "px";
-        snake.style.top = snakeY + "px";
-        requestAnimationFrame(moveSnake);
+    // Startposition for skibet
+    var shipPosition = {
+      x: 250,
+      y: 150
+    };
+    
+    // Tasterne der bruges til at styre skibet
+    var keys = {
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false
+    };
+    
+    // Funktionen, der kører, når spillet starter
+    function startGame() {
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
+      
+      // Starter spilloopet
+      setInterval(gameLoop, 16);
+    }
+    
+    // Funktionen der håndterer tastetryk
+    function handleKeyDown(event) {
+      event.preventDefault();
+      
+      if (event.code in keys) {
+        keys[event.code] = true;
       }
-
-      moveSnake();
-    });
+    }
+    
+    // Funktionen der håndterer tasteløft
+    function handleKeyUp(event) {
+      event.preventDefault();
+      
+      if (event.code in keys) {
+        keys[event.code] = false;
+      }
+    }
+    
+    // Spilloopet
+    function gameLoop() {
+      var ship = document.getElementById('ship');
+      
+      // Opdaterer skibets position baseret på tastetryk
+      if (keys.ArrowUp) {
+        shipPosition.y -= 2;
+      }
+      
+      if (keys.ArrowDown) {
+        shipPosition.y += 2;
+      }
+      
+      if (keys.ArrowLeft) {
+        shipPosition.x -= 2;
+      }
+      
+      if (keys.ArrowRight) {
+        shipPosition.x += 2;
+      }
+      
+      // Opdaterer skibets visuelle position
+      ship.style.top = shipPosition.y + 'px';
+      ship.style.left = shipPosition.x + 'px';
+      
+      // Kollisionstjek med bjerge
+      var obstacles = document.getElementsByClassName('obstacle');
+      
+      for (var i = 0; i < obstacles.length; i++) {
+        var obstacle = obstacles[i];
+        
+        if (isColliding(ship, obstacle)) {
+          endGame();
+          return;
+        }
+      }
+    }
+    
+    // Funktionen der tjekker for kollision mellem to elementer
+    function isColliding(element1, element2) {
+      var rect1 = element1.getBoundingClientRect();
+      var rect2 = element2.getBoundingClientRect();
+      
+      return !(rect1.right < rect2.left ||
+               rect1.left > rect2.right ||
+               rect1.bottom < rect2.top ||
+               rect1.top > rect2.bottom);
+    }
+    
+    // Funktionen der afslutter spillet
+    function endGame() {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+      
+      alert('Spillet er slut! Du kolliderede med et bjerg.');
+    }
+  </script>
+  
+  <script>
+    // Funktionen der tilføjer bjerge til spillet
+    function addObstacle() {
+      var gameContainer = document.getElementById('game-container');
+      
+      var obstacle = document.createElement('div');
+      obstacle.className = 'obstacle';
+      
+      // Placering af bjerg på tilfældig x-position
+      var obstacleX = Math.floor(Math.random() * 480);
+      obstacle.style.left = obstacleX + 'px';
+      
+      gameContainer.appendChild(obstacle);
+      
+      // Fjern bjerg efter 3 sekunder
+      setTimeout(function() {
+        obstacle.remove();
+      }, 3000);
+    }
+    
+    // Starter tilføjelse af bjerge hvert sekund
+    setInterval(addObstacle, 1000);
   </script>
 </body>
 </html>
