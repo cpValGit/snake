@@ -1,95 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Klaver</title>
   <style>
-    .key {
-      display: inline-block;
-      width: 50px;
-      height: 200px;
-      background-color: white;
-      border: 1px solid black;
-      cursor: pointer;
-    }
-    
-    .black-key {
-      position: relative;
-      margin-left: -20px;
-      width: 40px;
-      height: 120px;
-      background-color: black;
-      z-index: 1;
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
   </style>
 </head>
 <body>
-  <h1>Klaver</h1>
-  
-  <div id="keyboard">
-    <div class="key" onclick="playSound('C')"></div>
-    <div class="key black-key" onclick="playSound('C#')"></div>
-    <div class="key" onclick="playSound('D')"></div>
-    <div class="key black-key" onclick="playSound('D#')"></div>
-    <div class="key" onclick="playSound('E')"></div>
-    <div class="key" onclick="playSound('F')"></div>
-    <div class="key black-key" onclick="playSound('F#')"></div>
-    <div class="key" onclick="playSound('G')"></div>
-    <div class="key black-key" onclick="playSound('G#')"></div>
-    <div class="key" onclick="playSound('A')"></div>
-    <div class="key black-key" onclick="playSound('A#')"></div>
-    <div class="key" onclick="playSound('B')"></div>
-    <div class="key" onclick="playSound('C2')"></div>
-  </div>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
   
   <script>
-    // Funktionen, der afspiller lyden baseret på den modtagne tone
-    function playSound(note) {
-      var audio = new Audio();
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    
+    const gridSize = 20;
+    let snake = [{ x: 6, y: 6 }];
+    let food = generateFoodPosition();
+    let direction = "right";
+    
+    function generateFoodPosition() {
+      return {
+        x: Math.floor(Math.random() * canvas.width / gridSize) * gridSize,
+        y: Math.floor(Math.random() * canvas.height / gridSize) * gridSize
+      };
+    }
+    
+    function drawSnake() {
+      ctx.fillStyle = "green";
+      for (let segment of snake) {
+        ctx.fillRect(segment.x, segment.y, gridSize, gridSize);
+      }
+    }
+    
+    function drawFood() {
+      ctx.fillStyle = "red";
+      ctx.fillRect(food.x, food.y, gridSize, gridSize);
+    }
+    
+    function update() {
+      let headX = snake[0].x;
+      let headY = snake[0].y;
       
-      switch (note) {
-        case 'C':
-          audio.src = 'sounds/c.wav';
-          break;
-        case 'C#':
-          audio.src = 'sounds/c-sharp.wav';
-          break;
-        case 'D':
-          audio.src = 'sounds/d.wav';
-          break;
-        case 'D#':
-          audio.src = 'sounds/d-sharp.wav';
-          break;
-        case 'E':
-          audio.src = 'sounds/e.wav';
-          break;
-        case 'F':
-          audio.src = 'sounds/f.wav';
-          break;
-        case 'F#':
-          audio.src = 'sounds/f-sharp.wav';
-          break;
-        case 'G':
-          audio.src = 'sounds/g.wav';
-          break;
-        case 'G#':
-          audio.src = 'sounds/g-sharp.wav';
-          break;
-        case 'A':
-          audio.src = 'sounds/a.wav';
-          break;
-        case 'A#':
-          audio.src = 'sounds/a-sharp.wav';
-          break;
-        case 'B':
-          audio.src = 'sounds/b.wav';
-          break;
-        case 'C2':
-          audio.src = 'sounds/c2.wav';
-          break;
+      if (direction === "right") headX += gridSize;
+      if (direction === "left") headX -= gridSize;
+      if (direction === "up") headY -= gridSize;
+      if (direction === "down") headY += gridSize;
+      
+      const newHead = { x: headX, y: headY };
+      snake.unshift(newHead);
+      
+      if (headX === food.x && headY === food.y) {
+        food = generateFoodPosition();
+      } else {
+        snake.pop();
       }
       
-      audio.play();
+      // TODO: Add game over conditions
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawSnake();
+      drawFood();
+      
+      setTimeout(update, 100);
     }
+    
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowUp" && direction !== "down") direction = "up";
+      if (event.key === "ArrowDown" && direction !== "up") direction = "down";
+      if (event.key === "ArrowLeft" && direction !== "right") direction = "left";
+      if (event.key === "ArrowRight" && direction !== "left") direction = "right";
+    });
+    
+    update();
   </script>
 </body>
 </html>
