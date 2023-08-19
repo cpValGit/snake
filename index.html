@@ -38,6 +38,13 @@
       };
     }
     
+    function generateRandomPosition() {
+      return {
+        x: Math.floor(Math.random() * (canvas.width / gridSize - 1)) * gridSize,
+        y: Math.floor(Math.random() * (canvas.height / gridSize - 1)) * gridSize
+      };
+    }
+    
     function drawSnake() {
       ctx.fillStyle = "green";
       for (let segment of snake) {
@@ -75,8 +82,9 @@
         headY <= boxPosition.y + boxSize * gridSize
       ) {
         lives -= 1;
-        snake = [{ x: 6, y: 6 }]; // Reset snake position
-        if (lives === 0) {
+        if (lives > 0) {
+          snake = [generateRandomPosition()]; // Reset snake position
+        } else {
           // TODO: Game over logic
         }
       }
