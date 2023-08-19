@@ -1,125 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    #gameCanvas {
-      border: 1px solid black;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
-  
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    
-    const gridSize = 20;
-    let snake = [{ x: 6, y: 6 }];
-    let food = generateFoodPosition();
-    let direction = "right";
-    let score = 0;
-    let lives = 5;
-    
-    const boxPosition = { x: 10, y: 10 }; // Adjust the box position as needed
-    const boxSize = 6; // Adjust the box size as needed
-    
-    function generateFoodPosition() {
-      return {
-        x: Math.floor(Math.random() * canvas.width / gridSize) * gridSize,
-        y: Math.floor(Math.random() * canvas.height / gridSize) * gridSize
-      };
-    }
-    
-    function generateRandomPosition() {
-      return {
-        x: Math.floor(Math.random() * (canvas.width / gridSize - 1)) * gridSize,
-        y: Math.floor(Math.random() * (canvas.height / gridSize - 1)) * gridSize
-      };
-    }
-    
-    function drawSnake() {
-      ctx.fillStyle = "green";
-      for (let segment of snake) {
-        ctx.fillRect(segment.x, segment.y, gridSize, gridSize);
-      }
-    }
-    
-    function drawFood() {
-      ctx.fillStyle = "red";
-      ctx.fillRect(food.x, food.y, gridSize, gridSize);
-    }
-    
-    function drawBox() {
-      ctx.fillStyle = "blue";
-      ctx.fillRect(boxPosition.x, boxPosition.y, boxSize * gridSize, boxSize * gridSize);
-    }
-    
-    function update() {
-      let headX = snake[0].x;
-      let headY = snake[0].y;
-      
-      if (direction === "right") headX += gridSize;
-      if (direction === "left") headX -= gridSize;
-      if (direction === "up") headY -= gridSize;
-      if (direction === "down") headY += gridSize;
-      
-      const newHead = { x: headX, y: headY };
-      snake.unshift(newHead);
-      
-      // Check collision with the box
-      if (
-        headX >= boxPosition.x &&
-        headX <= boxPosition.x + boxSize * gridSize &&
-        headY >= boxPosition.y &&
-        headY <= boxPosition.y + boxSize * gridSize
-      ) {
-        lives -= 1;
-        if (lives > 0) {
-          snake = [generateRandomPosition()]; // Reset snake position
-        } else {
-          // TODO: Game over logic
+    <title>IP and Location Tracker</title>
+    <script>
+        function getLocation() {
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const ipAddress = data.ip;
+                    document.getElementById('ipAddress').textContent = `IP Address: ${ipAddress}`;
+                    
+                    fetch(`https://ipapi.co/${ipAddress}/json/`)
+                        .then(response => response.json())
+                        .then(locationData => {
+                            const location = `${locationData.city}, ${locationData.region}, ${locationData.country_name}`;
+                            document.getElementById('location').textContent = `Location: ${location}`;
+                        })
+                        .catch(error => console.error('Error fetching location:', error));
+                })
+                .catch(error => console.error('Error fetching IP address:', error));
         }
-      }
-      
-      if (headX === food.x && headY === food.y) {
-        food = generateFoodPosition();
-        score += 1;
-      } else {
-        snake.pop();
-      }
-      
-      // TODO: Add game over conditions
-      
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawSnake();
-      drawFood();
-      drawBox();
-      
-      // Display the score and lives
-      ctx.fillStyle = "black";
-      ctx.font = "20px Arial";
-      ctx.fillText("Score: " + score, 10, 30);
-      ctx.fillText("Lives: " + lives, 10, 60);
-      
-      setTimeout(update, 100);
-    }
-    
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowUp" && direction !== "down") direction = "up";
-      if (event.key === "ArrowDown" && direction !== "up") direction = "down";
-      if (event.key === "ArrowLeft" && direction !== "right") direction = "left";
-      if (event.key === "ArrowRight" && direction !== "left") direction = "right";
-    });
-    
-    update();
-  </script>
+    </script>
+</head>
+<body onload="getLocation()">
+    <h1>IP and Location Tracker</h1>
+    <p id="ipAddress">Fetching IP address...</p>
+    <p id="location">Fetching location...</p>
 </body>
 </html>
