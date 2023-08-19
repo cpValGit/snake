@@ -9,6 +9,9 @@
       height: 100vh;
       margin: 0;
     }
+    #gameCanvas {
+      border: 1px solid black;
+    }
   </style>
 </head>
 <body>
@@ -23,6 +26,10 @@
     let food = generateFoodPosition();
     let direction = "right";
     let score = 0;
+    let lives = 5;
+    
+    const boxPosition = { x: 10, y: 10 }; // Adjust the box position as needed
+    const boxSize = 6; // Adjust the box size as needed
     
     function generateFoodPosition() {
       return {
@@ -43,6 +50,11 @@
       ctx.fillRect(food.x, food.y, gridSize, gridSize);
     }
     
+    function drawBox() {
+      ctx.fillStyle = "blue";
+      ctx.fillRect(boxPosition.x, boxPosition.y, boxSize * gridSize, boxSize * gridSize);
+    }
+    
     function update() {
       let headX = snake[0].x;
       let headY = snake[0].y;
@@ -54,6 +66,20 @@
       
       const newHead = { x: headX, y: headY };
       snake.unshift(newHead);
+      
+      // Check collision with the box
+      if (
+        headX >= boxPosition.x &&
+        headX <= boxPosition.x + boxSize * gridSize &&
+        headY >= boxPosition.y &&
+        headY <= boxPosition.y + boxSize * gridSize
+      ) {
+        lives -= 1;
+        snake = [{ x: 6, y: 6 }]; // Reset snake position
+        if (lives === 0) {
+          // TODO: Game over logic
+        }
+      }
       
       if (headX === food.x && headY === food.y) {
         food = generateFoodPosition();
@@ -67,11 +93,13 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawSnake();
       drawFood();
+      drawBox();
       
-      // Display the score
+      // Display the score and lives
       ctx.fillStyle = "black";
       ctx.font = "20px Arial";
       ctx.fillText("Score: " + score, 10, 30);
+      ctx.fillText("Lives: " + lives, 10, 60);
       
       setTimeout(update, 100);
     }
