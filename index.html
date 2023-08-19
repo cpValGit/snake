@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>IP and Location Tracker</title>
+    <title>IP and Location Information</title>
     <script>
-        function getLocation() {
+        function getIPInfo() {
             fetch('https://api.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
@@ -12,19 +12,28 @@
                     
                     fetch(`https://ipapi.co/${ipAddress}/json/`)
                         .then(response => response.json())
-                        .then(locationData => {
-                            const location = `${locationData.city}, ${locationData.region}, ${locationData.country_name}`;
-                            document.getElementById('location').textContent = `Location: ${location}`;
+                        .then(ipInfo => {
+                            document.getElementById('location').textContent = `Location: ${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country_name}`;
+                            document.getElementById('isp').textContent = `ISP: ${ipInfo.org}`;
+                            document.getElementById('organization').textContent = `Organization: ${ipInfo.org}`;
+                            document.getElementById('connectionType').textContent = `Connection Type: ${ipInfo.type}`;
+                            document.getElementById('timeZone').textContent = `Time Zone: ${ipInfo.timezone}`;
+                            document.getElementById('proxy').textContent = `Proxy: ${ipInfo.proxy}`;
                         })
-                        .catch(error => console.error('Error fetching location:', error));
+                        .catch(error => console.error('Error fetching IP information:', error));
                 })
                 .catch(error => console.error('Error fetching IP address:', error));
         }
     </script>
 </head>
-<body onload="getLocation()">
-    <h1>IP and Location Tracker</h1>
+<body onload="getIPInfo()">
+    <h1>IP and Location Information</h1>
     <p id="ipAddress">Fetching IP address...</p>
     <p id="location">Fetching location...</p>
+    <p id="isp">Fetching ISP...</p>
+    <p id="organization">Fetching organization...</p>
+    <p id="connectionType">Fetching connection type...</p>
+    <p id="timeZone">Fetching time zone...</p>
+    <p id="proxy">Fetching proxy information...</p>
 </body>
 </html>
